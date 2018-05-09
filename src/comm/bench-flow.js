@@ -202,7 +202,7 @@ function defaultTest(args, clientArgs, final) {
     return new Promise( function(resolve, reject) {
         const t = global.tapeObj;
         t.comment('\n\n###### testing \'' + args.label + '\' ######');
-        let testLabel   = args.label;
+        let testLabel   = args.label4Report ? args.label4Report : args.label;
         let testRounds  = args.txDuration ? args.txDuration : args.txNumber;
         let tests = []; // array of all test rounds
         let configPath = path.relative(absCaliperDir, absNetworkFile);

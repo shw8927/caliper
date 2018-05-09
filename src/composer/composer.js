@@ -166,6 +166,7 @@ class Composer extends BlockchainInterface {
                 invoke_status.time_final = Date.now();
                 invoke_status.status = 'failed';
                 invoke_status.result = [];
+                console.log("composer.js submitTranscation error=",err);
 
                 return Promise.resolve(invoke_status);
             });
