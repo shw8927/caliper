@@ -36,8 +36,8 @@ var busNetConnections;  // Global map of all business network connections to be 
 var busFactory;
 var testBankNum = 0;
 var testTransferReqPerbank = 0; 
-var bankIdPrefix = "BankID00_";
-var bankNamePrefix= "BankName";
+var bankIdPrefix = "BankIdR0_";
+var bankNamePrefix= "BankNameR0_";
 
 var globalTransferID = 160;
 var globalBankNumber = 100;
@@ -75,15 +75,18 @@ module.exports.init = async function(blockchain, context, args) {
             bankPartipant.workingCurrency = 'USD';
             bankparticipants.push(bankPartipant);
         }
-        await participantRegistry.addAll(bankparticipants);
+     //   await participantRegistry.addAll(bankparticipants);
 
         console.log("create connection cards for new participants ...");
 
         let participants = await participantRegistry.getAll();
         for (let partIndex=0; partIndex < participants.length; partIndex++){
             console.log("Current participant name=",participants[partIndex].bankingName);
+            if (participants[partIndex].bankingName.indexOf(bankNamePrefix) != -1){
+                console.log(" new bankXXXX  got it , .....")
             let newConnection = await composerUtils.obtainConnectionForParticipant(adminNetConnection, busNetName, participants[partIndex], participants[partIndex].bankingName);
              busNetConnections.set(participants[partIndex].bankingName, newConnection);
+            }
 
         }
 
@@ -126,7 +129,7 @@ module.exports.run = async function() {
    
     //return _createBankParticipant(adminNetConnection);
     //return _testCreateTransferRequestAsset('BankName1');
-    return _invokeCreateBatchTX('BankName0');
+    return _invokeCreateBatchTX(bankNamePrefix+'0');
 
     /*
     let busFactory = busNetConnections.get('BankName1').getBusinessNetwork().getFactory();
@@ -147,17 +150,27 @@ module.exports.run = async function() {
 
 module.exports.end = async function(results) {
     console.log("=========== In End section ============");
+    /*** *
+    await _invokeMarkPreProcessCompleteTX('BankNameX0','BATCH00_0:BankID00_X10');
+    await _invokeMarkPreProcessCompleteTX('BankNameX1','BATCH00_0:BankID00_X10');
+    await _invokeCompleteSettlementTX('BankNameX0','BATCH00_0:BankID00_X10');
+    await _invokeMarkPostProcessCompleteTX('BankNameX0','BATCH00_0:BankID00_X10');
+    await _invokeMarkPostProcessCompleteTX('BankNameX1','BATCH00_0:BankID00_X10');
+    ***/
 
-    await _invokeMarkPreProcessCompleteTX('BankName0','BATCH00_0:BankID00_10');
-    await _invokeMarkPreProcessCompleteTX('BankName1','BATCH00_0:BankID00_10');
-    await _invokeCompleteSettlementTX('BankName0','BATCH00_0:BankID00_10');
-    await _invokeMarkPostProcessCompleteTX('BankName0','BATCH00_0:BankID00_10');
-    await _invokeMarkPostProcessCompleteTX('BankName1','BATCH00_0:BankID00_10');
-    let connectionName='admin';
+   let connectionName='admin';
+
+   console.log("======before delete all .TransferRequest =========")
+
+    await  _removeAllAssets(connectionName,namespace+".TransferRequest");
+    
 
     await _showAllTransferRequest(connectionName);
 
     await _showAllBatchTransferRequest(connectionName);
+    console.log("======before delete all .BatchTransferRequest =========")
+
+    await  _removeAllAssets(connectionName,namespace+".BatchTransferRequest");
 
     return Promise.resolve(true);
 };
@@ -179,6 +192,18 @@ function _createTransferAsset(factory, transferId, amount, currency, globalState
     return asset;
 }
 
+async function _removeAllAssets(connectionName,assetName){
+    console.log("before delete Totoal transferRequest asset Number =",transAssets.length);
+    
+    let assetRegistry = await  busNetConnections.get(connectionName).getAssetRegistry(assetName);
+    let assets= await assetRegistry.getAll();
+    console.log("before delete Totoal transferRequest asset Number =",assets.length);
+     await transferRassetReg.removeAll();
+    let assets= await assetRegistry.getAll();
+    console.log("after delete Totoal transferRequest asset Number =",assets.length);
+    
+
+}
 async function  _createTransferRequestAsset(connectionName) {
    let transferRegistryX = await  busNetConnections.get(connectionName).getAssetRegistry(namespace + '.TransferRequest');
    let busFactoryX = busNetConnections.get(userName).getBusinessNetwork().getFactory();
@@ -202,6 +227,10 @@ async function  _createTransferRequestAsset(connectionName) {
 }  
 
 async  function _createBatchTransferRequestAsset(connectionName){
+    let busFactory = busNetConnections.get(connectionName).getBusinessNetwork().getFactory();
+    let txn = busFactory.newTransaction(namespace, 'MarkPostProcessComplete');
+    txn.batchId = batchId;
+    return bc.bcObj.submitTransaction(busNetConnections.get(connectionName), txn);
 
 }
 
