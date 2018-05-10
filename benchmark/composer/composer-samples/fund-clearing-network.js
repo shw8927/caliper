@@ -27,6 +27,7 @@
 module.exports.info  = "Fund-clearing Network Performance Test";
 
 const composerUtils = require('../../../src/composer/composer_utils');
+const AdminConnection = require('composer-admin').AdminConnection;
 const namespace = 'org.clearing';
 const busNetName = 'fund-clearing-network';
 
@@ -52,6 +53,8 @@ module.exports.init = async function(blockchain, context, args) {
     adminNetConnection = context;
     testBankNum = args.participantBankNumber;
     testTransferReqPerbank = args.transferReqPerBank;
+      bankIdPrefix =args.bankIdPrefix;
+    bankNamePrefix =args.bankNamePrefix;
     
     //step1:  Parameter check
     if ((testBankNum < 1) || (testTransferReqPerbank < 1 )) {
@@ -75,7 +78,7 @@ module.exports.init = async function(blockchain, context, args) {
             bankPartipant.workingCurrency = 'USD';
             bankparticipants.push(bankPartipant);
         }
-     //   await participantRegistry.addAll(bankparticipants);
+        await participantRegistry.addAll(bankparticipants);
 
         console.log("create connection cards for new participants ...");
 
@@ -111,7 +114,7 @@ module.exports.init = async function(blockchain, context, args) {
 
          } 
     
-    await     _invokeCreateBatchTX('BankName1');
+    await     _invokeCreateBatchTX(bankNamePrefix+'1');
     console.log('TransferAsset addition complete');
     console.log('=======In init section ========');
     await _showAllTransferRequest('admin');
@@ -157,20 +160,58 @@ module.exports.end = async function(results) {
     await _invokeMarkPostProcessCompleteTX('BankNameX0','BATCH00_0:BankID00_X10');
     await _invokeMarkPostProcessCompleteTX('BankNameX1','BATCH00_0:BankID00_X10');
     ***/
+    //step 1 disconnect all bankeParticpant connections
+   for (var key of  busNetConnections.keys()) {
+       if (key !='admin'){
+        await busNetConnections.get(key).disconnect();
+        console.log("Connection " + key +" is closed" );
+       }
+   }
 
    let connectionName='admin';
 
    console.log("======before delete all .TransferRequest =========")
 
     await  _removeAllAssets(connectionName,namespace+".TransferRequest");
-    
-
-    await _showAllTransferRequest(connectionName);
 
     await _showAllBatchTransferRequest(connectionName);
     console.log("======before delete all .BatchTransferRequest =========")
 
     await  _removeAllAssets(connectionName,namespace+".BatchTransferRequest");
+
+     //step 3: remove all  identity for participants  
+    let idReg = await adminNetConnection.getIdentityRegistry();
+    let ids= await idReg.getAll();
+    for (let j=0; j<ids.length; j++) {
+        let idx=ids[j];
+        console.log("current identifier NO.=",j);
+        console.log(`IdentityName=${idx.name},IdentityState=${idx.state}, IdentityIssuer=${idx.issuer}, IdentityID=${idx.identityId},`);
+      if ((idx.name !='admin') && (idx.state !="REVOKED")){
+        await adminNetConnection.revokeIdentity(idx.identityId);
+        console.log(idx.identityId +" is revoked");
+        }
+    }
+
+   //step4  remove all particiapants 
+    let participantRegistry = await adminNetConnection.getParticipantRegistry(namespace + '.BankingParticipant')
+    let participants = await participantRegistry.getAll();
+    await participantRegistry.removeAll(participants);
+
+      //step 5 delete all cards of participants 
+    let  adminConnection = new AdminConnection();
+    console.log("participants length="+ participants.length);
+     for (let partIndex in participants){
+       console.log("current participant="+partIndex);
+       let userID=participants[partIndex].bankingName;
+       const cardName = `PerfUser${userID}@${busNetName}`;
+       console.log("card name="+cardName);
+       let exists = await adminConnection.hasCard(cardName);  
+             
+       if (exists) {
+           console.log('Delete existing business network user card: ', cardName);
+           await adminConnection.deleteCard(cardName);
+        }
+    }
 
     return Promise.resolve(true);
 };
@@ -193,15 +234,13 @@ function _createTransferAsset(factory, transferId, amount, currency, globalState
 }
 
 async function _removeAllAssets(connectionName,assetName){
-    console.log("before delete Totoal transferRequest asset Number =",transAssets.length);
     
     let assetRegistry = await  busNetConnections.get(connectionName).getAssetRegistry(assetName);
     let assets= await assetRegistry.getAll();
     console.log("before delete Totoal transferRequest asset Number =",assets.length);
-     await transferRassetReg.removeAll();
-    let assets= await assetRegistry.getAll();
+     await assetRegistry.removeAll(assets);
+     assets= await assetRegistry.getAll();
     console.log("after delete Totoal transferRequest asset Number =",assets.length);
-    
 
 }
 async function  _createTransferRequestAsset(connectionName) {

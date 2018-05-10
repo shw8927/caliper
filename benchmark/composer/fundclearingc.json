@@ -5,7 +5,7 @@
     },
     "command" : {
       "start": "docker-compose -f network/fabric-v11/2-org-1-peer/docker-compose-tls.yaml up -d",
-      "end": "docker-compose -f network/fabric-v11/2-org-1-peer/docker-compose-tls.yaml down;docker rm $(docker ps -aq);docker rmi $(docker images dev-* -q)"
+      "end": "docker-compose -f network/fabric-v11/2-org-1-peer/docker-compose-tls.yaml down;docker rm $(docker ps -aq)"
     },
     "test": {
       "name": "Fund-Clearing Performance test",
@@ -20,7 +20,16 @@
                 "txNumber" : [10],
                 "trim" : 0,
                 "rateControl" : [{"type": "fixed-rate", "opts": {"tps": 0.2}}],
-                "arguments": {"participantBankNumber":4,"transferReqPerBank": 7},
+                "arguments": {"participantBankNumber":4,"transferReqPerBank": 7, "bankIdPrefix": "BankIDR1_","bankNamePrefix": "BankNameR1_"},
+                "callback" : "benchmark/composer/composer-samples/fund-clearing-network.js"
+              },
+               {
+                "label" : "fund-clearing-network",
+                "label4Report" : "Fund-clearing-round2",
+                "txNumber" : [10],
+                "trim" : 0,
+                "rateControl" : [{"type": "fixed-rate", "opts": {"tps": 1}}],
+                "arguments": {"participantBankNumber":4,"transferReqPerBank": 7, "bankIdPrefix": "BankIDR2_","bankNamePrefix": "BankNameR2_"},
                 "callback" : "benchmark/composer/composer-samples/fund-clearing-network.js"
               }
              
@@ -29,7 +38,7 @@
     "monitor": {
       "type": ["docker", "process"],
       "docker":{
-        "name": ["orderer.example.com","ca.org2.example.com","peer0.org1.example.com"]
+        "name": ["all"]
       },
       "process": [
         {
