@@ -16,14 +16,11 @@ coverage
 node_modules
 
 # Benchmarks
-/benchmark/drm
-/benchmark/simple
 
 # Scripts
 /scripts
 
 # Plugins
-/src/fabric
 /src/gui
 /src/iroha
 /src/sawtooth/
