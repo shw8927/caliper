@@ -1,0 +1,41 @@
+{
+  "blockchain": {
+    "type": "composer",
+    "config": "network/fabric-v11/2-org-1-peer/composer-marbles-tls.json"
+  },
+  "command" : {
+    "start": "docker-compose -f network/fabric-v11/2-org-1-peer/docker-compose-tls.yaml up -d",
+    "end": "docker-compose -f network/fabric-v11/2-org-1-peer/docker-compose-tls.yaml down;docker rm $(docker ps -aq)"
+  },
+  "test": {
+    "name": "Composer Performance test",
+    "description" : "This is an example Composer perf test",
+    "clients": {
+      "type": "local",
+      "number": 1
+    },
+    "rounds": [{
+              "label" : "marbles-network",
+              "label4Report" : "Composer_marble_open",
+              "txNumber" : [5000],
+              "trim" : 0,
+              "rateControl" : [{"type": "fixed-rate", "opts": {"tps" : 100}}],
+              "arguments": {"testAssets": 50},
+              "callback" : "benchmark/composer/composer-samples/marbles-network.js"
+            }]
+  },
+  "monitor": {
+    "type": ["docker", "process"],
+    "docker":{
+      "name": ["all"]
+    },
+    "process": [
+      {
+        "command" : "node",
+        "arguments" : "client.js",
+        "multiOutput" : "avg"
+      }
+    ],
+    "interval": 1
+  }
+}

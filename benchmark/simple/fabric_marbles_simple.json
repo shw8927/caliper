@@ -65,7 +65,7 @@
         "deployed": false
       }
     ],
-    "chaincodes": [{"id": "marbles_node", "path": "/root/sunhwei/c511/caliper/src/contract/fabric/nodeCC/marbles", "language":"node", "version": "v0", "channel": "mychannel"}],
+    "chaincodes": [{"id": "marbles", "path": "contract/fabric/marbles", "language":"golang", "version": "v0", "channel": "mychannel"}],
     "endorsement-policy": {
       "identities": [
         {
@@ -90,8 +90,8 @@
       "policy": { "2-of": [{"signed-by": 0}, {"signed-by": 1}]}
     },
     "context": {
-      "node_marblesopen": "mychannel",
-      "node_marblequery": "mychannel"
+      "marblesopen": "mychannel",
+      "marblequery": "mychannel"
     }
   },
   "info" : {

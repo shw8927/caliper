@@ -14,13 +14,33 @@
       "type": "local",
       "number": 1
     },
-    "rounds": [{
-        "label" : "marblesopen",
-        "txNumber" : [5],
-        "rateControl" : [{"type": "fixed-rate", "opts": {"tps" : 10}}, {"type": "fixed-rate", "opts": {"tps" : 20}}, {"type": "fixed-rate", "opts": {"tps" : 30}}],
+    "rounds": [
+        {
+        "label" : "node_marblesopen",
+        "label4Report" : "node_marble_open",
+        "txNumber" : [5000],
+        "rateControl" : [{"type": "fixed-rate", "opts": {"tps" : 300}}, {"type": "fixed-rate", "opts": {"tps" : 20}}, {"type": "fixed-rate", "opts": {"tps" : 30}}],
         "arguments": { "money": 1000 },
-        "callback" : "benchmark/nodecc/open_marbles.js"
-      }
+        "callback" : "benchmark/nodecc/marbles_open.js"
+      },
+      {
+          "label" : "node_marblesopen",
+          "label4Report" : "node_marble_transfer",
+          "txNumber" : [5000],
+          "rateControl" : [{"type": "fixed-rate", "opts": {"tps" : 300}}, {"type": "fixed-rate", "opts": {"tps" : 20}}, {"type": "fixed-rate", "opts": {"tps" : 30}}],
+          "arguments": { "money": 1000 },
+          "callback" : "benchmark/nodecc/marbles_transfer.js"
+        },
+         {
+            "label" : "node_marblesopen",
+            "label4Report" : "node_marble_delete",
+            "txNumber" : [5000],
+            "rateControl" : [{"type": "fixed-rate", "opts": {"tps" : 300}}, {"type": "fixed-rate", "opts": {"tps" : 20}}, {"type" : "fixed-rate", "opts": {"tps" : 30}}],
+            "arguments": { "money": 1000 },
+            "callback" : "benchmark/nodecc/marbles_delete.js"
+          }
+
+
  
     ]
   },
