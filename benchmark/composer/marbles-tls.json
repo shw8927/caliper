@@ -16,7 +16,7 @@
     },
     "rounds": [{
               "label" : "marbles-network",
-              "lable4Report" : "marbles-open",
+              "label4Report" : "marbles-open",
               "txNumber" : [1000],
               "trim" : 0,
               "rateControl" : [{"type": "fixed-rate", "opts": {"tps" : 50}}],
@@ -25,7 +25,7 @@
             },
             {
                 "label" : "marbles-network",
-                "lable4Report" : "marbles-transfer",
+                "label4Report" : "marbles-transfer",
                 "txNumber" : [500],
                 "trim" : 0,
                 "rateControl" : [{"type": "fixed-rate", "opts": {"tps" : 20}}],
@@ -34,7 +34,7 @@
               },
               {
                   "label" : "marbles-network",
-                  "lable4Report" : "marbles-delete",
+                  "label4Report" : "marbles-delete",
                   "txNumber" : [500],
                   "trim" : 0,
                   "rateControl" : [{"type": "fixed-rate", "opts": {"tps" : 40}}],
