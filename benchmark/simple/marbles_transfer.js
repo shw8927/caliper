@@ -41,10 +41,10 @@ module.exports.init = async function(blockchain, context, args) {
 
 module.exports.run = function() {
 
-    let tempId= (marblePostfix++)%100;
+//    let tempId= (marblePostfix++)%100;
       marblePostfix++;
     // return bc.invokeSmartContract(contx, 'marbles', 'v0', {verb: 'initMarble', marbleName: "marble"+marblePostfix, color: "blue",size:"50",owner:"sunhwei"}, 30);
-      return bc.invokeSmartContract(contx, 'marbles', 'v0', {verb: 'transferMarble', marbleName: "marble"+marblePostfix ,owner:"sunhwei_new"}, 30);
+      return bc.invokeSmartContract(contx, 'marbles', 'v0', {verb: 'transferMarble', marbleName: "marble"+marblePostfix ,owner:"sunhwei_new"}, 50);
    
 }
 

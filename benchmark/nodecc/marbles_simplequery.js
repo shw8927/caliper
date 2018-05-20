@@ -14,7 +14,7 @@ var marblePostfix;
 var originalOwner;
 var newOwner;
 var bc, contx;
-module.exports.init = async function(blockchain, context, args) {
+module.exports.init = function(blockchain, context, args) {
 
     // ==== Invoke marbles ====
 // peer chaincode invoke -C myc1 -n marbles -c '{"Args":["initMarble","marble1","blue","35","tom"]}'
@@ -29,37 +29,40 @@ module.exports.init = async function(blockchain, context, args) {
 // peer chaincode query -C myc1 -n marbles -c '{"Args":["getMarblesByRange","marble1","marble3"]}'
 // peer chaincode query -C myc1 -n marbles -c '{"Args":["getHistoryForMarble","marble1"]}'
 
+
+  //  if(!args.hasOwnProperty('money')) {
+  //      return Promise.reject(new Error("simple.open - 'money' is missed in the arguments"));
+  //  }
+
+  //  initMoney = args['money'].toString();
     bc = blockchain;
     contx = context;
-    marblePostfix = 0;
+    marblePostfix = 1;
     originalOwner = "sunhwei";
     newOwner="shw100";
-   /*
-    for (let i=0; i<100; i++){
-        marblePostfix++;
-        await bc.invokeSmartContract(contx, 'marbles', 'v0', {verb: 'initMarble', marbleName: "marble"+marblePostfix, color: "blue",size:"50",owner:"sunhwei"}, 30);
-    }
-   */ 
-   return Promise.resolve();
-}
-
-module.exports.run = function() {
-
- //   let tempId= (marblePostfix++)%100;
-      marblePostfix++;
-    return bc.invokeSmartContract(contx, 'marbles', 'v0', {verb: 'initMarble', marbleName: "marble"+marblePostfix, color: "blue",size:"50",owner:"sunhwei"}, 50);
-     // return bc.invokeSmartContract(contx, 'marbles', 'v0', {verb: 'transferMarble', marbleName: "marble"+tempId ,owner:"sunhwei"}, 30);
-   
-}
-
-module.exports.end = async function(results) {
-    marblePostfix=0;
-    for (let i=0; i<100; i++){
-//        marblePostfix++;
-       // await bc.invokeSmartContract(contx, 'marbles', 'v0', {verb: 'initMarble', marbleName: "marble"+marblePostfix, color: "blue",size:"50",owner:"sunhwei"}, 30);
-       // await bc.invokeSmartContract(contx, 'marbles', 'v0', {verb: 'delete', marbleName: "marble"+marblePostfix }, 30);
-
-    }
     return Promise.resolve();
 }
+
+
+module.exports.run = function() {
+   
+    marblePostfix++;
+
+   // return bc.queryState(contx, 'marbles_node', 'v0', {"fcn":"readMarble", "args": ["marble3"]});
+     
+//    return bc.queryState(contx, 'marbles_node', 'v0', {"fcn":"queryMarblesByOwner", "args": ["sunhweix"]});
+    
+//    return bc.queryState(contx, 'marbles_node', 'v0', {"fcn":"queryMarbles", "args": [{"selector":{"owner":"sunhweix"}}]});
+  
+//"{\"selector\":{\"owner\":\"tom\"}}"
+
+return bc.queryState(contx, 'marbles_node', 'v0', {"fcn":"queryMarbles", "args": ["{\"selector\":{\"owner\":\"sunhweix\"}}"]});      
+  // return bc.invokeSmartContract(contx, 'marbles_node', 'v0', {verb: 'initMarble', marbleName: "marble"+marblePostfix, color: "blue",size:"50",owner:"sunhwei"}, 30);
+}
+
+module.exports.end = function(results) {
+    return Promise.resolve();
+}
+
+module.exports.accounts = accounts;
 
