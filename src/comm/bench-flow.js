@@ -300,7 +300,11 @@ module.exports.run = function(configFile, networkFile) {
         startPromise.then(() => {
             return blockchain.init();
         }).then( () => {
-            return blockchain.installSmartContract();
+            console.log("wait for 10 seconds for install chaincode  ...");
+            return Util.sleep(10000).then( () => {
+
+                return blockchain.installSmartContract();
+             })
         }).then( () => {
             return client.init().then((number)=>{
                 return blockchain.prepareClients(number);
