@@ -298,13 +298,20 @@ module.exports.run = function(configFile, networkFile) {
         });
 
         startPromise.then(() => {
-            return blockchain.init();
+             let config = require(absConfigFile);
+             if (config.hasOwnProperty('skipInitChannel')){
+                return Promise.resolve();
+            } else return blockchain.init();
         }).then( () => {
+            let config = require(absConfigFile);
+            if (config.hasOwnProperty('skipInstallChaincode')){
+                return Promise.resolve();
+            } else  {
             console.log("wait for 10 seconds for install chaincode  ...");
             return Util.sleep(10000).then( () => {
 
                 return blockchain.installSmartContract();
-             })
+             })}
         }).then( () => {
             return client.init().then((number)=>{
                 return blockchain.prepareClients(number);
