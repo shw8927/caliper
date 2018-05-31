@@ -1,11 +1,11 @@
 {
   "blockchain": {
     "type": "fabric",
-    "config": "benchmark/nodecc/fabric_marbles_fabricv11.json"
+    "config": "benchmark/nodecc/fabric_marbles.json"
   },
   "command" : {
-    "start": "docker-compose -f network/fabric-v11/2-org-1-peer/docker-compose-tls.yaml  up  -d",
-    "endxx" : "docker-compose -f  network/fabric-v11/2-org-1-peer/docker-compose-tls.yaml down;docker rm $(docker ps -aq)"
+    "start": "docker-compose -f network/fabric/simplenetwork/docker-compose.yaml up -d",
+    "end" : "docker-compose -f network/fabric/simplenetwork/docker-compose.yaml down;docker rm $(docker ps -aq)"
   },
   "test": {
     "name": "marbles_node",
@@ -18,30 +18,30 @@
         {
         "label" : "node_marblesopen",
         "label4Report" : "node_marble_open",
-        "txNumber" : [3000],
+        "txDuration" : [300],
         "rateControl" : [{"type": "fixed-rate", "opts": {"tps" : 50}}, {"type": "fixed-rate", "opts": {"tps" : 20}}, {"type": "fixed-rate", "opts": {"tps" : 30}}],
         "arguments": { "money": 1000 },
+        "trim" : 10,
         "callback" : "benchmark/nodecc/marbles_open.js"
       },
       {
           "label" : "node_marblesopen",
           "label4Report" : "node_marble_transfer",
-          "txNumber" : [3000],
+          "txDuration" : [200],
           "rateControl" : [{"type": "fixed-rate", "opts": {"tps" : 50}}, {"type": "fixed-rate", "opts": {"tps" : 20}}, {"type": "fixed-rate", "opts": {"tps" : 30}}],
           "arguments": { "money": 1000 },
+          "trim" : 10, 
           "callback" : "benchmark/nodecc/marbles_transfer.js"
         },
          {
             "label" : "node_marblesopen",
             "label4Report" : "node_marble_delete",
             "txNumber" : [3000],
-            "rateControl" : [{"type": "fixed-rate", "opts": {"tps" : 60}}, {"type": "fixed-rate", "opts": {"tps" : 20}}, {"type" : "fixed-rate", "opts": {"tps" : 30}}],
+            "rateControl" : [{"type": "fixed-rate", "opts": {"tps" : 50}}, {"type": "fixed-rate", "opts": {"tps" : 20}}, {"type" : "fixed-rate", "opts": {"tps" : 30}}],
             "arguments": { "money": 1000 },
+            "trim" :10,
             "callback" : "benchmark/nodecc/marbles_delete.js"
           }
-
-
- 
     ]
   },
   "monitor": {

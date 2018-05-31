@@ -34,7 +34,7 @@ module.exports.run = function() {
           "marbleName" : "marble"+ marblePostfix,
           "owner" : "sunhweiX"
           };
-    return bc.invokeSmartContract(contx, ccName, ccVersion,  tempTran,  120);
+    return bc.invokeSmartContract(contx, ccName, ccVersion,  tempTran,  150);
 
 }
 
