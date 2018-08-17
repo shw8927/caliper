@@ -32,6 +32,8 @@ const Client = require('fabric-client');
 
 module.exports.run = function (config_path) {
     Client.addConfigFile(config_path);
+    testUtil.init(config_path);
+    e2eUtils.init(config_path);
     testUtil.setupChaincodeDeploy();
     const fabricSettings = Client.getConfigSetting('fabric');
     let chaincodes = fabricSettings.chaincodes;
