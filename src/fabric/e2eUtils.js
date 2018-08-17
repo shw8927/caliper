@@ -211,6 +211,7 @@ function instantiateChaincode(chaincode, endorsement_policy, upgrade){
     Client.setConfigSetting('request-timeout', 120000);
 
     let channel = testUtil.getChannel(chaincode.channel);
+    let ccchannel = testUtil.getChannel(chaincode.channel);
     if(channel === null) {
         return Promise.reject(new Error('could not find channel in config'));
     }
@@ -257,7 +258,7 @@ function instantiateChaincode(chaincode, endorsement_policy, upgrade){
         the_user = admin;
 
         let eventPeer = null;
-        for(let org in ORGS) {
+        for(let org of  ccchannel.organizations) {
             if(ORGS.hasOwnProperty(org) && org.indexOf('org') === 0) {
                 for (let key in ORGS[org]) {
                     if(ORGS[org].hasOwnProperty(key) && key.indexOf('peer') === 0) {
