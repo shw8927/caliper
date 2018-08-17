@@ -38,7 +38,6 @@ const commUtils = require('../comm/util');
 
 let channels = [];
 let cryptodir;
-const rootpath = '../..';
 let ORGS;
 
 module.exports.getChannel = function(name) {
@@ -72,7 +71,7 @@ module.exports.storePathForOrg = function(org) {
 module.exports.setupChaincodeDeploy = function() {
     if (typeof process.env.OVERWRITE_GOPATH === 'undefined' ||
         process.env.OVERWRITE_GOPATH.toString().toUpperCase() === 'TRUE') {
-        process.env.GOPATH = path.join(__dirname, rootpath);
+        process.env.GOPATH = commUtils.resolvePath('.');
     }
 };
 
@@ -147,7 +146,7 @@ module.exports.init = function(config_path) {
     const fa = Client.getConfigSetting('fabric');
     ORGS = fa.network;
     channels = fa.channel;
-    cryptodir = fa.cryptodir;
+    cryptodir = commUtils.resolvePath(fa.cryptodir);
 };
 
 const tlsOptions = {
@@ -222,18 +221,23 @@ function getAdmin(client, userOrg) {
         const org = ORGS[userOrg];
         let keyPEM, certPEM;
         if(org.user) {
-            keyPEM = fs.readFileSync(path.join(__dirname, '../..', org.user.key));
-            certPEM = fs.readFileSync(path.join(__dirname, '../..', org.user.cert));
+            keyPEM = fs.readFileSync(commUtils.resolvePath(org.user.key));
+            certPEM = fs.readFileSync(commUtils.resolvePath(org.user.cert));
         }
         else {
-            let keyPath = path.join(__dirname, util.format('../../%s/peerOrganizations/%s.example.com/users/Admin@%s.example.com/keystore', cryptodir, userOrg, userOrg));
+            let domain = org.domain ? org.domain : (userOrg + '.example.com');
+            // crypto-dir is already an absolute path
+            let basePath = path.join(cryptodir, 'peerOrganizations', domain, 'users', util.format('Admin@%s', domain));
+
+            let keyPath = path.join(basePath, 'keystore');
             if(!fs.existsSync(keyPath)) {
-                keyPath = path.join(__dirname, util.format('../../%s/peerOrganizations/%s.example.com/users/Admin@%s.example.com/msp/keystore', cryptodir, userOrg, userOrg));
+                keyPath = path.join(basePath, 'msp', 'keystore');
             }
             keyPEM = readAllFiles(keyPath)[0];
-            let certPath = path.join(__dirname, util.format('../../%s/peerOrganizations/%s.example.com/users/Admin@%s.example.com/signcerts', cryptodir, userOrg, userOrg));
+
+            let certPath = path.join(basePath, 'signcerts');
             if(!fs.existsSync(certPath)) {
-                certPath = path.join(__dirname, util.format('../../%s/peerOrganizations/%s.example.com/users/Admin@%s.example.com/msp/signcerts', cryptodir, userOrg, userOrg));
+                certPath = path.join(basePath, 'msp', 'signcerts');
             }
             certPEM = readAllFiles(certPath)[0];
         }
@@ -270,25 +274,29 @@ function getOrdererAdmin(client) {
         const orderer = ORGS.orderer;
         let keyPEM, certPEM;
         if(orderer.user) {
-            keyPEM = fs.readFileSync(path.join(__dirname, '../..', orderer.user.key));
-            certPEM = fs.readFileSync(path.join(__dirname, '../..', orderer.user.cert));
+            keyPEM = fs.readFileSync(commUtils.resolvePath(orderer.user.key));
+            certPEM = fs.readFileSync(commUtils.resolvePath(orderer.user.cert));
         }
         else {
-            let keyPath = path.join(__dirname, util.format('../../%s/ordererOrganizations/example.com/users/Admin@example.com/keystore', cryptodir));
+            let domain = orderer.domain ? orderer.domain : 'example.com';
+            // crypto-dir is already an absolute path
+            let basePath = path.join(cryptodir, 'ordererOrganizations', domain, 'users', util.format('Admin@%s', domain));
+
+            let keyPath = path.join(basePath, 'keystore');
             if(!fs.existsSync(keyPath)) {
-                keyPath = path.join(__dirname, util.format('../../%s/ordererOrganizations/example.com/users/Admin@example.com/msp/keystore', cryptodir));
+                keyPath = path.join(basePath, 'msp', 'keystore');
             }
             keyPEM = readAllFiles(keyPath)[0];
-            let certPath = path.join(__dirname, util.format('../../%s/ordererOrganizations/example.com/users/Admin@example.com/signcerts', cryptodir));
+            let certPath = path.join(basePath, 'signcerts');
             if(!fs.existsSync(certPath)) {
-                certPath = path.join(__dirname, util.format('../../%s/ordererOrganizations/example.com/users/Admin@example.com/msp/signcerts', cryptodir));
+                certPath = path.join(basePath, 'msp', 'signcerts');
             }
             certPEM = readAllFiles(certPath)[0];
         }
 
         return Promise.resolve(client.createUser({
             username: 'ordererAdmin',
-            mspid: 'OrdererMSP',
+            mspid: orderer.mspid,
             cryptoContent: {
                 privateKeyPEM: keyPEM.toString(),
                 signedCertPEM: certPEM.toString()

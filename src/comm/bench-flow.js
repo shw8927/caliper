@@ -28,7 +28,7 @@ let resultsbyround = [];    // results table for each test round
 let round = 0;              // test round
 let demo = require('../gui/src/demo.js');
 let absConfigFile, absNetworkFile;
-let absCaliperDir = path.join(__dirname, '../..');
+let absCaliperDir = path.join(__dirname, '..', '..');
 
 /**
  * Generate mustache template for test report
@@ -86,8 +86,8 @@ function printTable(value) {
  * @return {Array} row of the title
  */
 function getResultTitle() {
-    // TODO: allow configure percentile value
-    return ['Name', 'Succ', 'Fail', 'Send Rate', 'Max Latency', 'Min Latency', 'Avg Latency', '75%ile Latency', 'Throughput'];
+    // temporarily remove percentile return ['Name', 'Succ', 'Fail', 'Send Rate', 'Max Latency', 'Min Latency', 'Avg Latency', '75%ile Latency', 'Throughput'];
+    return ['Name', 'Succ', 'Fail', 'Send Rate', 'Max Latency', 'Min Latency', 'Avg Latency', 'Throughput'];
 }
 
 /**
@@ -105,7 +105,8 @@ function getResultValue(r) {
         row.push(r.delay.max.toFixed(2) + ' s');
         row.push(r.delay.min.toFixed(2) + ' s');
         row.push((r.delay.sum / r.succ).toFixed(2) + ' s');
-        if(r.delay.detail.length === 0) {
+        // temporarily remove percentile
+        /*if(r.delay.detail.length === 0) {
             row.push('N/A');
         }
         else{
@@ -113,12 +114,13 @@ function getResultValue(r) {
                 return a-b;
             });
             row.push(r.delay.detail[Math.floor(r.delay.detail.length * 0.75)].toFixed(2) + ' s');
-        }
+        }*/
 
         (r.final.max === r.final.min) ? row.push(r.succ + ' tps') : row.push(((r.succ / (r.final.max - r.create.min)).toFixed(0)) + ' tps');
     }
     catch (err) {
-        row = [r.label, 0, 0, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'];
+        // temporarily remove percentile row = [r.label, 0, 0, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'];
+        row = [r.label, 0, 0, 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'];
     }
 
     return row;
@@ -158,7 +160,7 @@ function processResult(results, label){
         resultTable[0] = getResultTitle();
         let r;
         if(Blockchain.mergeDefaultTxStats(results) === 0) {
-            r = Blockchain.createNullDefaultTxStats;
+            r = Blockchain.createNullDefaultTxStats();
             r.label = label;
         }
         else {
@@ -233,6 +235,7 @@ function defaultTest(args, clientArgs, final) {
                 log('----test round ' + round + '----');
                 round++;
                 testIdx++;
+                item.roundIdx = round; // propagate round ID to clients
                 demo.startWatch(client);
 
                 return client.startTest(item, clientArgs, processResult, testLabel).then( () => {
@@ -272,8 +275,8 @@ function defaultTest(args, clientArgs, final) {
 module.exports.run = function(configFile, networkFile) {
     test('#######Caliper Test######', (t) => {
         global.tapeObj = t;
-        absConfigFile  = configFile;
-        absNetworkFile = networkFile;
+        absConfigFile  = Util.resolvePath(configFile);
+        absNetworkFile = Util.resolvePath(networkFile);
         blockchain = new Blockchain(absNetworkFile);
         monitor = new Monitor(absConfigFile);
         client  = new Client(absConfigFile);

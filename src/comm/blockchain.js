@@ -97,31 +97,34 @@ class Blockchain {
     }
 
     /**
-     * Invoke a smart contract and return a txStatus object or an array of txStatus objects which contain informations of the transaction
-     * txStatus = {
-     *     'id': transaction's id
-     *     'status':  status of the transaction, should be:
-     *                - 'created': successfully created, but not validated or committed yet
-     *                - 'success': successfully validated and committed in the ledger
-     *     'time_create': time(ms) that the transaction was created
-     *     'time_final':  time(ms) that the transaction was known to be final and committed in ledger
-     *     'result': response payloads of the transaction request
-     *     ...... :  other adapter specific properties
-     * }
-     * @param {Object} context context object from getContext
+     * Invoke smart contract/submit transactions and return corresponding transactions' status
+     * @param {Object} context context object
      * @param {String} contractID identiy of the contract
      * @param {String} contractVer version of the contract
-     * @param {JSON} args input parameters for the contract
+     * @param {Array} args array of JSON formatted arguments for multiple transactions
      * @param {Number} timeout request timeout, in second
      * @return {Promise} txStatus object or an array of txStatus objects
      */
     invokeSmartContract(context, contractID, contractVer, args, timeout) {
-        if(typeof timeout !== 'number' || timeout < 0) {
-            return this.bcObj.invokeSmartContract(context, contractID, contractVer, args, 120);
+        let arg, time;    // compatible with old version
+        if(Array.isArray(args)) {
+            arg = args;
+        }
+        else if(typeof args === 'object') {
+            arg = [args];
         }
         else {
-            return this.bcObj.invokeSmartContract(context, contractID, contractVer, args, timeout);
+            return Promise.reject(new Error('Invalid args for invokeSmartContract()'));
         }
+
+        if(typeof timeout !== 'number' || timeout < 0) {
+            time = 120;
+        }
+        else {
+            time = timeout;
+        }
+
+        return this.bcObj.invokeSmartContract(context, contractID, contractVer, arg, time);
     }
 
     /**
@@ -149,7 +152,7 @@ class Blockchain {
         let delays = [];
         for(let i = 0 ; i < results.length ; i++) {
             let stat   = results[i];
-            let create = stat.time_create;
+            let create = stat.GetTimeCreate();
 
             if(typeof minCreate === 'undefined') {
                 minCreate = create;
@@ -164,9 +167,9 @@ class Blockchain {
                 }
             }
 
-            if(stat.status === 'success') {
+            if(stat.IsCommitted()) {
                 succ++;
-                let final = stat.time_final;
+                let final = stat.GetTimeFinal();
                 let d     = (final - create) / 1000;
                 if(typeof minFinal === 'undefined') {
                     minFinal = final;

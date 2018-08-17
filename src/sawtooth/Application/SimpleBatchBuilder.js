@@ -3,22 +3,34 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  *
- * @file, batchBuilder for simple use case and it use case specific logic to
- * buildBatch and calculateAddress
  **/
 
-'use strict'
+'use strict';
 
-var BatchBuilder = require('./BatchBuilder.js')
+const BatchBuilder = require('./BatchBuilder.js');
 
+/**
+ * BatchBuilder for simple use case and it use case specific logic to
+ * buildBatch and calculateAddress
+ */
 class SimpleBatchBuilder extends BatchBuilder {
 
+    /**
+     * Constructor
+     * @param {String} fName transaction family name
+     * @param {String} fVersion transaction family version
+     */
     constructor(fName, fVersion) {
         super();
         this.familyName = fName;
         this.familyVersion = fVersion;
     }
 
+    /**
+     * Builds sawtooth batch from list of simple transactions
+     * @param {object} args list smallbank transactions
+     * @returns {object} batch list bytes
+     */
     buildBatch(args) {
         const {createHash} = require('crypto');
         const {createContext, CryptoFactory} = require('sawtooth-sdk/signing');
@@ -27,32 +39,36 @@ class SimpleBatchBuilder extends BatchBuilder {
 
         const privateKey = context.newRandomPrivateKey();
         const signer = new CryptoFactory(context).newSigner(privateKey);
-        var addr = args['account'];
-        var address = this.calculateAddress(addr);
-        var addresses = [address];
 
-        const cbor = require('cbor');
-        const payloadBytes = cbor.encode(args);
-    
-        const transactionHeaderBytes = protobuf.TransactionHeader.encode({
-            familyName: this.familyName,
-            familyVersion: this.familyVersion,
-            inputs: addresses,
-            outputs: addresses,
-            signerPublicKey: signer.getPublicKey().asHex(),
-            batcherPublicKey: signer.getPublicKey().asHex(),
-            dependencies: [],
-            payloadSha512: createHash('sha512').update(payloadBytes).digest('hex')
-        }).finish();
+        let transactions = [];
+        for(let i = 0; i < args.length; i++) {
+            const addr = args[i].account;
+            const address = this.calculateAddress(addr);
+            const addresses = [address];
 
-        const txnSignature = signer.sign(transactionHeaderBytes);
-        const transaction = protobuf.Transaction.create({
-            header: transactionHeaderBytes,
-            headerSignature: txnSignature,
-            payload: payloadBytes
-        });
+            const cbor = require('cbor');
+            const payloadBytes = cbor.encode(args[i]);
 
-        const transactions = [transaction];
+            const transactionHeaderBytes = protobuf.TransactionHeader.encode({
+                familyName: this.familyName,
+                familyVersion: this.familyVersion,
+                inputs: addresses,
+                outputs: addresses,
+                signerPublicKey: signer.getPublicKey().asHex(),
+                batcherPublicKey: signer.getPublicKey().asHex(),
+                dependencies: [],
+                payloadSha512: createHash('sha512').update(payloadBytes).digest('hex')
+            }).finish();
+
+            const txnSignature = signer.sign(transactionHeaderBytes);
+            const transaction = protobuf.Transaction.create({
+                header: transactionHeaderBytes,
+                headerSignature: txnSignature,
+                payload: payloadBytes
+            });
+            transactions.push(transaction);
+        }
+
         const batchHeaderBytes = protobuf.BatchHeader.encode({
             signerPublicKey: signer.getPublicKey().asHex(),
             transactionIds: transactions.map((txn) => txn.headerSignature),
@@ -72,15 +88,18 @@ class SimpleBatchBuilder extends BatchBuilder {
         return batchListBytes;
     }
 
+    /**
+     * Calculate address
+     * @param {*} name address name
+     * @return {String} address
+     */
     calculateAddress(name) {
         const crypto = require('crypto');
         const _hash = (x) =>
             crypto.createHash('sha512').update(x).digest('hex').toLowerCase();
-
         const familyNameSpace = _hash(this.familyName).substring(0, 6);
         let address = familyNameSpace + _hash(name).slice(-64);
         return address;
     }
- 
 }
 module.exports = SimpleBatchBuilder;
