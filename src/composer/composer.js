@@ -79,7 +79,7 @@ class Composer extends BlockchainInterface {
      * Deploys business networks
      * @returns {Promise} a completed Promise
      */
-    installSmartContract() {
+    async installSmartContract() {
         Util.log('Deploying Composer');
         // Here, this relates to deploying a Composer BusinessNetwork to the Blockchain platform
         // - runtime install on each participating org
@@ -87,7 +87,7 @@ class Composer extends BlockchainInterface {
         // - conditionally set log level
         let config = require(this.configPath);
         let chaincodes = config.composer.chaincodes;
-
+        await    composer_utils.createAdminBusNetCards(config);
         // Expand required deployments
         let busnets =[];
         chaincodes.forEach((busnet) => {
