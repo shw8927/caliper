@@ -4,7 +4,7 @@
             {
                 "path": "contract/fabric/simple/go", 
                 "version": "v0", 
-                "id": "simplex0", 
+                "id": "simple", 
                 "language": "golang", 
                 "channel": "channel1"
             }
