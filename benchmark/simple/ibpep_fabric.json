@@ -1,0 +1,86 @@
+{
+    "fabric": {
+        "chaincodes": [
+            {
+                "path": "contract/fabric/simple/go", 
+                "version": "v0", 
+                "id": "simplex0", 
+                "language": "golang", 
+                "channel": "channel1"
+            }
+        ], 
+        "cryptodir": "network/fabric/simplenetwork/crypto-config", 
+        "network": {
+            "org_PeerOrg2": {
+                "name": "PeerOrg2", 
+                "mspid": "PeerOrg2", 
+                "ca": {
+                    "url": "https://ash-zbc04a.4.secure.blockchain.ibm.com:20019", 
+                    "name": "fabric-ca-peerorg2-20019a"
+                }, 
+                "peer_fabric-peer-org2-20075c": {
+                    "tls_cacerts": "network/fabric/ibpep/fabric-peer-org2-20075c_tlscacerts.pem", 
+                    "server-hostname": "ash-zbc04c.4.secure.blockchain.ibm.com", 
+                    "requests": "grpcs://ash-zbc04c.4.secure.blockchain.ibm.com:20075", 
+                    "events": "grpcs://ash-zbc04c.4.secure.blockchain.ibm.com:20074"
+                }, 
+                "user": {
+                    "cert": "network/fabric/ibpep/creds/PeerOrg2admin/msp/signcerts/cert.pem", 
+                    "key": "network/fabric/ibpep/creds/PeerOrg2admin/msp/keystore/priv.pem"
+                }, 
+                "peer_fabric-peer-org2-20073a": {
+                    "tls_cacerts": "network/fabric/ibpep/fabric-peer-org2-20073a_tlscacerts.pem", 
+                    "server-hostname": "ash-zbc04a.4.secure.blockchain.ibm.com", 
+                    "requests": "grpcs://ash-zbc04a.4.secure.blockchain.ibm.com:20073", 
+                    "events": "grpcs://ash-zbc04a.4.secure.blockchain.ibm.com:20072"
+                }
+            }, 
+            "orderer": {
+                "domain": "", 
+                "mspid": "", 
+                "url": "grpcs://ash-zbc04b.4.secure.blockchain.ibm.com:20016", 
+                "msp": "", 
+                "tls_cacerts": "network/fabric/ibpep/ep_orderer_tls_cacerts.pem", 
+                "server-hostname": "ash-zbc04b.4.secure.blockchain.ibm.com"
+            }, 
+            "org_PeerOrg1": {
+                "peer_fabric-peer-org1-20069a": {
+                    "tls_cacerts": "network/fabric/ibpep/fabric-peer-org1-20069a_tlscacerts.pem", 
+                    "server-hostname": "ash-zbc04a.4.secure.blockchain.ibm.com", 
+                    "requests": "grpcs://ash-zbc04a.4.secure.blockchain.ibm.com:20069", 
+                    "events": "grpcs://ash-zbc04a.4.secure.blockchain.ibm.com:20068"
+                }, 
+                "name": "PeerOrg1", 
+                "mspid": "PeerOrg1", 
+                "ca": {
+                    "url": "https://ash-zbc04a.4.secure.blockchain.ibm.com:20018", 
+                    "name": "fabric-ca-peerorg1-20018a"
+                }, 
+                "user": {
+                    "cert": "network/fabric/ibpep/creds/PeerOrg1admin/msp/signcerts/cert.pem", 
+                    "key": "network/fabric/ibpep/creds/PeerOrg1admin/msp/keystore/priv.pem"
+                }, 
+                "peer_fabric-peer-org1-20071c": {
+                    "tls_cacerts": "network/fabric/ibpep/fabric-peer-org1-20071c_tlscacerts.pem", 
+                    "server-hostname": "ash-zbc04c.4.secure.blockchain.ibm.com", 
+                    "requests": "grpcs://ash-zbc04c.4.secure.blockchain.ibm.com:20071", 
+                    "events": "grpcs://ash-zbc04c.4.secure.blockchain.ibm.com:20070"
+                }
+            }
+        }, 
+        "context": {
+            "query": "channel1", 
+            "open": "channel1"
+        }, 
+        "channel": [
+            {
+                "organizations": [
+                    "org_PeerOrg1"
+                ], 
+                "config": "", 
+                "name": "channel1", 
+                "deployed": true
+            }
+        ]
+    }
+}
