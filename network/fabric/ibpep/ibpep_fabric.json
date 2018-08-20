@@ -1,0 +1,86 @@
+{
+    "fabric": {
+        "chaincodes": [
+            {
+                "path": "contract/fabric/simple/go", 
+                "version": "v0", 
+                "id": "simplex0", 
+                "language": "golang", 
+                "channel": "channel1"
+            }
+        ], 
+        "cryptodir": "network/fabric/simplenetwork/crypto-config", 
+        "network": {
+            "org_PeerOrg2": {
+                "name": "PeerOrg2", 
+                "mspid": "PeerOrg2", 
+                "ca": {
+                    "url": "TOBEREPLACED", 
+                    "name": "TOBEREPLACED"
+                }, 
+                "peer_fabric-peer-org2-20075c": {
+                    "tls_cacerts": "TOBEREPLACED", 
+                    "server-hostname": "TOBEREPLACED", 
+                    "requests": "TOBEREPLACED", 
+                    "events": "TOBEREPLACED"
+                }, 
+                "user": {
+                    "cert": "TOBEREPLACED", 
+                    "key": "TOBEREPLACED"
+                }, 
+                "peer_fabric-peer-org2-20073a": {
+                    "tls_cacerts": "TOBEREPLACED", 
+                    "server-hostname": "TOBEREPLACED", 
+                    "requests": "TOBEREPLACED", 
+                    "events": "TOBEREPLACED"
+                }
+            }, 
+            "orderer": {
+                "domain": "", 
+                "mspid": "", 
+                "url": "TOBEREPLACED", 
+                "msp": "", 
+                "tls_cacerts": "TOBEREPLACED", 
+                "server-hostname": "TOBEREPLACED"
+            }, 
+            "org_PeerOrg1": {
+                "peer_fabric-peer-org1-20069a": {
+                    "tls_cacerts": "TOBEREPLACED", 
+                    "server-hostname": "TOBEREPLACED", 
+                    "requests": "TOBEREPLACED", 
+                    "events": "TOBEREPLACED"
+                }, 
+                "name": "PeerOrg1", 
+                "mspid": "PeerOrg1", 
+                "ca": {
+                    "url": "TOBEREPLACED", 
+                    "name": "TOBEREPLACED"
+                }, 
+                "user": {
+                    "cert": "TOBEREPLACED", 
+                    "key": "TOBEREPLACED"
+                }, 
+                "peer_fabric-peer-org1-20071c": {
+                    "tls_cacerts": "TOBEREPLACED", 
+                    "server-hostname": "TOBEREPLACED", 
+                    "requests": "TOBEREPLACED", 
+                    "events": "TOBEREPLACED"
+                }
+            }
+        }, 
+        "context": {
+            "query": "channel1", 
+            "open": "channel1"
+        }, 
+        "channel": [
+            {
+                "organizations": [
+                    "org_PeerOrg1"
+                ], 
+                "config": "", 
+                "name": "channel1", 
+                "deployed": true
+            }
+        ]
+    }
+}
